@@ -1,24 +1,22 @@
 use serenity::async_trait;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
+use serenity::framework::standard::StandardFramework;
 use serenity::prelude::*;
 
 struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    // Set a handler for the `message` event - so that whenever a new message
-    // is received - the closure (or function) passed will be called.
-    //
-    // Event handlers are dispatched through a threadpool, and so multiple
-    // events can be dispatched simultaneously.
+    // Set a handler for the `message` event
+    // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched simultaneously.
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content == "!ping" {
+        if msg.content == "김범준" {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
             // channel, so log to stdout when some error happens, with a
             // description of it.
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
+            if let Err(why) = msg.channel_id.say(&ctx.http, "죽어").await {
                 println!("Error sending message: {:?}", why);
             }
         }
@@ -37,8 +35,9 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    // Configure the client with your Discord bot token in the environment.
+    // loading environment variables(ex. bot token)
     dotenv::dotenv().ok();
+    // Configure the client with your Discord bot token in the environment.
     let token = std::env::var("DISCORD_TOKEN").expect("Token not loadable from the environment!");
     // Set gateway intents, which decides what events the bot will be notified about
     let intents = GatewayIntents::GUILD_MESSAGES
@@ -49,7 +48,7 @@ async fn main() {
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
     let mut client =
-        Client::builder(&token, intents).framework(serenity::framework::standard::StandardFramework::new()).event_handler(Handler).await.expect("Err creating client");
+        Client::builder(&token, intents).framework(StandardFramework::new()).event_handler(Handler).await.expect("Err creating client");
 
     // Finally, start a single shard, and start listening to events.
     //
