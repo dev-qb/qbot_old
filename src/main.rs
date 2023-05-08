@@ -1,6 +1,10 @@
 use serenity::{
     async_trait,
-    model::{channel::Message, gateway::Ready},
+    model::{
+        guild::Guild,
+        channel::{Message, ChannelType},
+        gateway::Ready,
+    },
     framework::standard::StandardFramework,
     prelude::*,
 };
@@ -9,15 +13,24 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
+    async fn guild_create(&self, ctx: Context, guild: Guild, _is_new: bool) {
+        // Create a new text channel named "qbot"
+        if let Ok(channel) = guild.create_channel(&ctx.http, |c| {
+            c.name("qbot").kind(ChannelType::Text)
+        }).await {
+            println!("Created channel {:?}", channel);
+        }
+    }
+
     // Set a handler for the `message` event
     // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched simultaneously.
-    async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content == "!help" {
+    async fn message(&self, ctx: Context, msg_event: Message) {
+        if msg_event.content == "!help" {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
             // channel, so log to stdout when some error happens, with a
             // description of it.
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Not fully developed, please wait for future version!").await {
+            if let Err(why) = msg_event.channel_id.say(&ctx.http, "Not fully developed, please wait for future version!").await {
                 println!("Error sending message: {:?}", why);
             }
         }
