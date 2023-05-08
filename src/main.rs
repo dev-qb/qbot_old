@@ -1,8 +1,9 @@
-use serenity::async_trait;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::framework::standard::StandardFramework;
-use serenity::prelude::*;
+use serenity::{
+    async_trait,
+    model::{channel::Message, gateway::Ready},
+    framework::standard::StandardFramework,
+    prelude::*,
+};
 
 struct Handler;
 
@@ -11,12 +12,12 @@ impl EventHandler for Handler {
     // Set a handler for the `message` event
     // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched simultaneously.
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content == "김범준" {
+        if msg.content == "!help" {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
             // channel, so log to stdout when some error happens, with a
             // description of it.
-            if let Err(why) = msg.channel_id.say(&ctx.http, "죽어").await {
+            if let Err(why) = msg.channel_id.say(&ctx.http, "Not fully developed, please wait for future version!").await {
                 println!("Error sending message: {:?}", why);
             }
         }
@@ -48,7 +49,7 @@ async fn main() {
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
     let mut client =
-        Client::builder(&token, intents).framework(StandardFramework::new()).event_handler(Handler).await.expect("Err creating client");
+        Client::builder(&token, intents).framework(StandardFramework::new()).event_handler(Handler).await.expect("Error creating client!");
 
     // Finally, start a single shard, and start listening to events.
     //
