@@ -2,35 +2,95 @@ use serenity::{
     async_trait,
     model::{
         guild::Guild,
-        channel::{Message, ChannelType},
+        channel::{Message, ChannelType, GuildChannel},
         gateway::Ready,
     },
     framework::standard::StandardFramework,
     prelude::*,
 };
+use rand::Rng;
 
 struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn guild_create(&self, ctx: Context, guild: Guild, _is_new: bool) {
-        // Create a new text channel named "qbot"
-        if let Ok(channel) = guild.create_channel(&ctx.http, |c| {
-            c.name("qbot").kind(ChannelType::Text)
-        }).await {
-            println!("Created channel {:?}", channel);
+    // event handler for channel creation
+    async fn channel_create(&self, ctx: Context, created_channel: &GuildChannel) {
+        println!("Channel creation detected: {:?}", created_channel.name);
+        if let Err(why) = created_channel.id.say(&ctx.http, "New Channel!").await {
+            println!("Error sending message: {:?}", why);
         }
+    }
+
+    // not developed
+    async fn channel_delete(&self, ctx: Context, deleted_channel: &GuildChannel) {
+        println!("Channel deletion detected.");
+        if deleted_channel.name() == "qbot" {
+            // Create a new text channel named "qbot"
+            if let Ok(channel) = deleted_channel.guild_id.create_channel(&ctx.http, |c| {
+                c.name("qbot").kind(ChannelType::Text)
+            }).await {
+                println!("Recreated channel {:?}", channel);
+            }
+        }
+    }
+
+    async fn guild_create(&self, _ctx: Context, guild: Guild, _is_new: bool) {
+        println!("Bot addition to server detected: {:?}", guild.name);
     }
 
     // Set a handler for the `message` event
     // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched simultaneously.
-    async fn message(&self, ctx: Context, msg_event: Message) {
-        if msg_event.content == "!help" {
+    async fn message(&self, ctx: Context, msg: Message) {
+        if msg.content == "!help" && !msg.author.bot {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
             // channel, so log to stdout when some error happens, with a
             // description of it.
-            if let Err(why) = msg_event.channel_id.say(&ctx.http, "Not fully developed, please wait for future version!").await {
+            println!("help call deteceted.");
+            if let Err(why) = msg.channel_id.say(&ctx.http, "Not fully developed, please wait for future version!").await {
+                println!("Error sending message: {:?}", why);
+            }
+        }
+        else if msg.content == "김범준" && !msg.author.bot {
+            println!("김범준 call deteceted.");
+            if let Err(why) = msg.channel_id.say(&ctx.http, "죽어").await {
+                println!("Error sending message: {:?}", why);
+            }
+        }
+        else if msg.content == "히히" && !msg.author.bot {
+            println!("히히 call deteceted.");
+            if let Err(why) = msg.channel_id.say(&ctx.http, "히히").await {
+                println!("Error sending message: {:?}", why);
+            }
+        }
+        else if msg.content == "ㅋㅋ" && !msg.author.bot {
+            println!("ㅋㅋ call deteceted.");
+            if let Err(why) = msg.channel_id.say(&ctx.http, "ㅋㅋ").await {
+                println!("Error sending message: {:?}", why);
+            }
+        }
+        else if msg.content == "심심하다" && !msg.author.bot {
+            println!("심심하다 call deteceted.");
+            if let Err(why) = msg.channel_id.say(&ctx.http, "스타레일 해").await {
+                println!("Error sending message: {:?}", why);
+            }
+        }
+        else if msg.content == "뭐먹지" && !msg.author.bot {
+            let ran_num = rand::thread_rng().gen_range(0..11);
+            let food = match ran_num {
+                0 => "짜파게티", 1 => "고르곤졸라 파스타", 2 => "삼겹살",
+                3 => "피자", 4 => "옥수수스프", 5 => "냉면", 6 => "토스트",
+                7 => "시리얼", 8 => "김치볶음밥", 9 => "부대찌개", _ => "술",
+            };
+            println!("뭐먹지 call deteceted, recommended {}.", food);
+            if let Err(why) = msg.channel_id.say(&ctx.http, food).await {
+                println!("Error sending message: {:?}", why);
+            }
+        }
+        else if msg.content == "?" && !msg.author.bot {
+            println!("? call deteceted.");
+            if let Err(why) = msg.channel_id.say(&ctx.http, "?").await {
                 println!("Error sending message: {:?}", why);
             }
         }
