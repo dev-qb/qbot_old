@@ -42,55 +42,26 @@ impl EventHandler for Handler {
     // Set a handler for the `message` event
     // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched simultaneously.
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content == "!help" && !msg.author.bot {
-            // Sending a message can fail, due to a network error, an
-            // authentication error, or lack of permissions to post in the
-            // channel, so log to stdout when some error happens, with a
-            // description of it.
-            println!("help call deteceted.");
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Not fully developed, please wait for future version!").await {
-                println!("Error sending message: {:?}", why);
-            }
-        }
-        else if msg.content == "김범준" && !msg.author.bot {
-            println!("김범준 call deteceted.");
-            if let Err(why) = msg.channel_id.say(&ctx.http, "죽어").await {
-                println!("Error sending message: {:?}", why);
-            }
-        }
-        else if msg.content == "히히" && !msg.author.bot {
-            println!("히히 call deteceted.");
-            if let Err(why) = msg.channel_id.say(&ctx.http, "히히").await {
-                println!("Error sending message: {:?}", why);
-            }
-        }
-        else if msg.content == "ㅋㅋ" && !msg.author.bot {
-            println!("ㅋㅋ call deteceted.");
-            if let Err(why) = msg.channel_id.say(&ctx.http, "ㅋㅋ").await {
-                println!("Error sending message: {:?}", why);
-            }
-        }
-        else if msg.content == "심심하다" && !msg.author.bot {
-            println!("심심하다 call deteceted.");
-            if let Err(why) = msg.channel_id.say(&ctx.http, "스타레일 해").await {
-                println!("Error sending message: {:?}", why);
-            }
-        }
-        else if msg.content == "뭐먹지" && !msg.author.bot {
-            let ran_num = rand::thread_rng().gen_range(0..11);
-            let food = match ran_num {
-                0 => "짜파게티", 1 => "고르곤졸라 파스타", 2 => "삼겹살",
-                3 => "피자", 4 => "옥수수스프", 5 => "냉면", 6 => "토스트",
-                7 => "시리얼", 8 => "김치볶음밥", 9 => "부대찌개", _ => "술",
+        if !msg.author.bot {
+            let answer = match msg.content.as_str() {
+                "!help" => "Not fully developed, please wait for future version!",
+                "김범준" => "죽어",
+                "히히" => "히히",
+                "ㅋㅋ" => "ㅋㅋ",
+                "심심하다" => "스타레일 해",
+                "뭐먹지" => {
+                    let ran_num = rand::thread_rng().gen_range(0..11);
+                    match ran_num {
+                        0 => "짜파게티", 1 => "고르곤졸라 파스타", 2 => "삼겹살",
+                        3 => "피자", 4 => "옥수수스프", 5 => "냉면", 6 => "토스트",
+                        7 => "시리얼", 8 => "김치볶음밥", 9 => "부대찌개", _ => "술",
+                    }
+                },
+                "?" => "?",
+                _ => return,
             };
-            println!("뭐먹지 call deteceted, recommended {}.", food);
-            if let Err(why) = msg.channel_id.say(&ctx.http, food).await {
-                println!("Error sending message: {:?}", why);
-            }
-        }
-        else if msg.content == "?" && !msg.author.bot {
-            println!("? call deteceted.");
-            if let Err(why) = msg.channel_id.say(&ctx.http, "?").await {
+            println!("{} deteceted.", msg.content);
+            if let Err(why) = msg.channel_id.say(&ctx.http, answer).await {
                 println!("Error sending message: {:?}", why);
             }
         }
