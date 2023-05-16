@@ -1,4 +1,5 @@
 mod commands;
+mod message_match;
 
 use serenity::{
     async_trait,
@@ -44,11 +45,14 @@ impl EventHandler for Handler {
     // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched simultaneously.
     async fn message(&self, ctx: Context, msg: Message) {
         if !msg.author.bot {
-            let answer = commands::message_match::match_message(msg.content);
+            let answer = message_match::match_message(msg.content);
             match answer {
                 None => return,
-                Some(p) => if let Err(why) = msg.channel_id.say(&ctx.http, p).await {
+                Some(p) => {
+                    if let Err(why) = msg.channel_id.say(&ctx.http, p).await {
                     println!("Error sending message: {:?}", why);
+                    };
+                    println!("Sending '{}'", answer.unwrap());
                 },
             }
         }

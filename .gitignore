@@ -3,4 +3,4 @@ Cargo.lock
 .env
 /.cargo
 qbot.zip
-Makefile
+update_in_server.sh

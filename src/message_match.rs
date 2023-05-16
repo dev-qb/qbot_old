@@ -6,7 +6,7 @@ pub fn match_message(msg: String) -> Option<&'static str> {
         "김범준" => "죽어",
         "히히" => "히히",
         "ㅋㅋ" => "ㅋㅋ",
-        "심심하다" => "스타레일 해",
+        "심심하다" => "스타레일해",
         "용꼬야" => "말레니아 언제잡음",
         "뭐먹지" => {
             let ran_num = rand::thread_rng().gen_range(0..11);
