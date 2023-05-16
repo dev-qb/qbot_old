@@ -1,3 +1,7 @@
-/target
+target/
 Cargo.lock
 .env
+.cargo/
+qbot.zip
+update_in_server.sh
+message_match.rs

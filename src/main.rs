@@ -1,8 +1,11 @@
+mod commands;
+mod message_match;
+
 use serenity::{
     async_trait,
     model::{
         guild::Guild,
-        channel::{Message, ChannelType},
+        channel::{Message, ChannelType, GuildChannel},
         gateway::Ready,
     },
     framework::standard::StandardFramework,
@@ -13,25 +16,44 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn guild_create(&self, ctx: Context, guild: Guild, _is_new: bool) {
-        // Create a new text channel named "qbot"
-        if let Ok(channel) = guild.create_channel(&ctx.http, |c| {
-            c.name("qbot").kind(ChannelType::Text)
-        }).await {
-            println!("Created channel {:?}", channel);
+    // event handler for channel creation
+    async fn channel_create(&self, ctx: Context, created_channel: &GuildChannel) {
+        println!("Channel creation detected: {:?}", created_channel.name);
+        if let Err(why) = created_channel.id.say(&ctx.http, "New Channel!").await {
+            println!("Error sending message: {:?}", why);
         }
+    }
+
+    // not developed
+    async fn channel_delete(&self, ctx: Context, deleted_channel: &GuildChannel) {
+        println!("Channel deletion detected.");
+        if deleted_channel.name() == "qbot" {
+            // Create a new text channel named "qbot"
+            if let Ok(channel) = deleted_channel.guild_id.create_channel(&ctx.http, |c| {
+                c.name("qbot").kind(ChannelType::Text)
+            }).await {
+                println!("Recreated channel {:?}", channel);
+            }
+        }
+    }
+
+    async fn guild_create(&self, _ctx: Context, guild: Guild, _is_new: bool) {
+        println!("Bot addition to server detected: {:?}", guild.name);
     }
 
     // Set a handler for the `message` event
     // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched simultaneously.
-    async fn message(&self, ctx: Context, msg_event: Message) {
-        if msg_event.content == "!help" {
-            // Sending a message can fail, due to a network error, an
-            // authentication error, or lack of permissions to post in the
-            // channel, so log to stdout when some error happens, with a
-            // description of it.
-            if let Err(why) = msg_event.channel_id.say(&ctx.http, "Not fully developed, please wait for future version!").await {
-                println!("Error sending message: {:?}", why);
+    async fn message(&self, ctx: Context, msg: Message) {
+        if !msg.author.bot {
+            let answer = message_match::match_message(msg.content);
+            match answer {
+                None => return,
+                Some(p) => {
+                    if let Err(why) = msg.channel_id.say(&ctx.http, p).await {
+                    println!("Error sending message: {:?}", why);
+                    };
+                    println!("Sending '{}'", answer.unwrap());
+                },
             }
         }
     }
