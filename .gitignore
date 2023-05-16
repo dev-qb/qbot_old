@@ -4,4 +4,4 @@ Cargo.lock
 .cargo/
 qbot.zip
 update_in_server.sh
-src/message_match.rs
+message_match.rs
