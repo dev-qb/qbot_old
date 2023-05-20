@@ -52,7 +52,7 @@ impl EventHandler for Handler {
                     if let Err(why) = msg.channel_id.say(&ctx.http, p).await {
                     println!("Error sending message: {:?}", why);
                     };
-                    println!("Sending '{}'", answer.unwrap());
+                    println!("Sending '{}'", p);
                 },
             }
         }
